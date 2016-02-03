@@ -1,147 +1,56 @@
-# --- Serving options --- #
+# Site Info
+title:              "sSeBBaSs's Littles adventures"
+description:        "Sebastian Juarez Personal Site"
+google_verify:      dM_ZKxVqXfi38Ib1F1FCXOVbnbKIWWEjh8C8eTlol_8 # Put your Google Verification here
+google_analytics:   UA-69227278-1 # Put your Google Analytics code
 
-# url is the full website URL
-# baseurl is the website's URL without the hostname
+# Author Info
+author_name:        "Sebastian Juarez"
+author_email:       ssebbass@gmail.com
+author_gravatar:    7e2bd2d3fcf3c7ea07a06233f0a48baf # Gravatar md5 hash
+# twitter_username:   HeiswayiNrird
 
-# If you are building a simple GitHub user page (username.github.io) then use these settings:
-url: "http://username.github.io"
-baseurl: ""
+# Site Settings
+baseurl:            "" # Base URL must end WITHOUT a slash, default: ""
+page.url:           www.ssebbass.com
+permalink:          /notes/:title # Post permalink
+timezone:           Americas/Buenos_Aires # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-# If you are building a GitHub project page then use these settings:
-#url: "http://username.github.io/projectname"
-#baseurl: "/projectname"
+# Site Build
+highlighter:        pygments
+markdown:           redcarpet
+redcarpet:
+    extensions:     ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data", "highlight", "footnotes"]
+#arkdown:           kramdown
+#kramdown:
+#    input:          GFM
+sass:
+    style:          :compressed
 
-# Of course don't forget to change the username and projectname to YOUR username and project
+# Other Params
+include:            [ "robots.txt" ]
+exclude:            [ "LICENSE", "README.md", "CNAME", "vendor", "Gemfile" ]
+gems:
+  - jekyll-sitemap
 
-# Name of website
-title: My website
+compress_html:
+    clippings:      all
+    ingore:
+        envs:       [ "test" ]
 
-# Short description of your site
-description: A virtual proof that name is awesome!
-
-# --- Navigation bar options --- #
-
-# Image to show in the navigation bar - image must be a square (width = height)
-# Remove this parameter if you don't want an image in the navbar
-avatar: "/img/avatar-icon.png"
-
-# List of links in the navigation bar
-navbar-links:
-  Home: ""
-  About Me: "aboutme"
-  Author's home: "http://deanattali.com"
-  
-# --- Footer options --- #
-
-# Change all these values or delete the ones you don't want.
-# Important: you must keep the "name" parameter, everything else you can remove
-author:
-  name: Some Person
-  email: "youremail@domain.com"
-  facebook: yourname  # eg. daattali
-  github: yourname    # eg. daattali
-  twitter: yourname   # eg. daattali
-  linkedin: yourlink  # eg. "pub/dean-attali/8/946/143"
-  stackoverflow: yourlink  # eg. "3943160/daattali"
- 
-# Select which links to show in the footer
-footer-links-active:
-  rss: false
-  facebook: true
-  email: true
-  twitter: true
-  github: true
-  linkedin: false
-  stackoverflow: false
-
-# How to display the link to the website in the footer
-# Remove this if you don't want a link in the footer
-url-pretty: "MyWebsite.com"  # eg. "deanattali.com/beautiful-jekyll"
-
-# --- Misc --- #
-
-# Fill in your Disqus shortname (NOT the userid) if you want to support Disqus comments
-#disqus: ""
-
-# Fill in your Google Analytics ID to track your website using GA
-#google_analytics: ""
-
-# --- Don't need to touch anything below here (but you can if you want) --- #
-
-# Output options (more information on Jekyll's site)
-timezone: "America/Vancouver"
-markdown: kramdown
-highlighter: rouge
-permalink: /:year-:month-:day-:title/
-paginate: 5
-
-# Default YAML values (more information on Jekyll's site)
 defaults:
   -
     scope:
-      path: ""
-      type: "posts"
+      path:         ""
     values:
-      comments: true  # add comments to all blog posts
+      layout:       "null"
   -
     scope:
-      path: "" # all files
+      type:         "pages"
     values:
-      layout: "default"
-
-# Exclude these files from production site
-exclude:
-  - Gemfile
-  - Gemfile.lock
-  - LICENSE
-  - README.md
-  - CNAME
-  - Vagrantfile
-
-# prose.io config
-prose:
-  rooturl: '_posts'
-  media: 'img'
-  ignore:
-    - 404.html
-    - LICENSE
-    - feed.xml
-    - _config.yml
-    - /_layouts
-    - /_includes
-    - /css
-    - /img
-    - /js
-  metadata:
-    _posts:
-      - name: "layout"
-        field:
-          element: "hidden"
-          value: "post"
-      - name: "title"
-        field:
-          element: "text"
-          label: "Post title"
-          placeholder: "Title"
-          alterable: true
-      - name: "subtitle"
-        field:
-          element: "textarea"
-          label: "Subtitle"
-          placeholder: "A description of your post."
-          alterable: true
-      - name: "date"
-        field:
-          element: "text"
-          label: "Date"
-          help: "Enter date of post."
-          placeholder: "yyyy-mm-dd"
-          alterable: true
-      - name: "published"
-        field:
-          element: "checkbox"
-          label: "Publish"
-          help: "Check to publish post, uncheck to hide."
-  
-# Beautiful Jekyll / Dean Attali
-# 2fc73a3a967e97599c9763d05e564189
+      layout:       "page"
+  -
+    scope:
+      type:         "posts"
+    values:
+      layout:       "post"

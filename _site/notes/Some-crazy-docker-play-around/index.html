@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Some Crazy Docker Play Around</title><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@" /><meta name="twitter:title" content="Some Crazy Docker Play Around" /><meta name="twitter:description" content="Some-crazy-docker-play-around"><meta name="description" content="Some-crazy-docker-play-around"><meta name="google-site-verification" content="dM_ZKxVqXfi38Ib1F1FCXOVbnbKIWWEjh8C8eTlol_8"><link rel="icon" href="/assets/favicon.png"><link rel="apple-touch-icon" href="/assets/touch-icon.png"><link rel="stylesheet" href="//code.cdn.mozilla.net/fonts/fira.css"><link rel="stylesheet" href="/assets/core.css"><link rel="canonical" href="/notes/Some-crazy-docker-play-around"><link rel="alternate" type="application/atom+xml" title="sSeBBaSs's Littles adventures" href="/feed.xml" /></head><body><aside class="logo"> <a href="/"> <img src="http://www.gravatar.com/avatar/7e2bd2d3fcf3c7ea07a06233f0a48baf.png?s=80" class="gravatar"> </a> <span class="logo-prompt">Back to Home</span></aside><main> <noscript><style> article .footnotes { display: block; }</style></noscript><article><div class="center"><h1>Some Crazy Docker Play Around</h1><time>January 15, 2016</time></div><div class="divider"></div><h1 id="some-crazy-docker-play-around">Some-crazy-docker-play-around</h1><p>In this test we are going to try to put all this pieces together <strong>ceph + ocfs2 + etcd + docker + swarm + registry</strong></p><h2 id="why-ceph">Why ceph?</h2><p>Why not?. Basically I was trying to find some hi availability solution to support the registry service, the idea was to alocate the container file into some sort of distributed storage without using external storages.</p><h2 id="why-ocfs2">Why OCFS2?</h2><p>The idea was to provide a clustered file system to support ceph, and OCFS it really ease to setup.</p><h2 id="hosts">Hosts</h2><h2 id="ceph-cluster">CEPH Cluster</h2><h3 id="install-ceph-deploy-tool">Install ceph-deploy tool</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>apt install ceph-deploy
+</code></pre></div><h3 id="set-new-cluster-with-initial-mon-nodes">Set new cluster with initial mon nodes</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy new test01 test02
+</code></pre></div><h3 id="ceph-conf">ceph.conf</h3><div class="highlight"><pre><code class="language-text" data-lang="text">[global]
+fsid = 25343005-d497-472c-9646-e6e2e99efe68
+mon_initial_members = test01, test02
+mon_host = 192.168.122.105,192.168.122.177
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+filestore_xattr_use_omap = true
+# Initial pool size
+osd pool default size = 2
+# Set network
+public network = 192.168.122.0/24
+</code></pre></div><h3 id="install-ceph-packages">Install ceph packages</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy install test01 test02 test03
+</code></pre></div><h3 id="install-initial-mons">Install initial mons</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy mon create
+</code></pre></div><h3 id="gather-keys">Gather keys</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy gatherkeys test01
+cephadmin@test02:~/ceph<span class="nv">$ </span>ceph-deploy gatherkeys test01
+cephadmin@test03:~/ceph<span class="nv">$ </span>ceph-deploy gatherkeys test01
+</code></pre></div><h3 id="prepare-admin-hosts">Prepare admin hosts</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy admin test01 test02 test03
+</code></pre></div><h3 id="config-pull">Config pull</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test02:~/ceph<span class="nv">$ </span>ceph-deploy config pull test01
+cephadmin@test03:~/ceph<span class="nv">$ </span>ceph-deploy config pull test01
+</code></pre></div><h3 id="prepare-osd">Prepare OSD</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy osd prepare test01:/mnt/ceph test02:/mnt/ceph
+cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy osd activate test01:/mnt/ceph test02:/mnt/ceph
+</code></pre></div><h2 id="expand-cluster">Expand Cluster</h2><h3 id="expand-mons">Expand mons</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy mon add test03
+</code></pre></div><h3 id="expand-osd">Expand OSD</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy osd prepare test03:/mnt/ceph
+cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy osd activate test03:/mnt/ceph
+</code></pre></div><h3 id="cluster-status">Cluster Status</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>sudo ceph status
+    cluster 25343005-d497-472c-9646-e6e2e99efe68
+     health HEALTH_OK
+     monmap e2: <span class="m">3</span> mons at <span class="o">{</span><span class="nv">test01</span><span class="o">=</span>192.168.122.105:6789/0,test02<span class="o">=</span>192.168.122.177:6789/0,test03<span class="o">=</span>192.168.122.106:6789/0<span class="o">}</span>, election epoch 8, quorum 0,1,2 test01,test03,test02
+     osdmap e13: <span class="m">3</span> osds: <span class="m">3</span> up, <span class="m">3</span> in
+      pgmap v80: <span class="m">192</span> pgs, <span class="m">3</span> pools, <span class="m">0</span> bytes data, <span class="m">0</span> objects
+            <span class="m">15463</span> MB used, <span class="m">45943</span> MB / <span class="m">61407</span> MB avail
+                 <span class="m">192</span> active+clean
+</code></pre></div><h3 id="metadata-server">Metadata server</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>ceph-deploy mds create test01 test02 test03
+</code></pre></div><h2 id="block-device">Block Device</h2><h3 id="configure-block-device">Configure Block device</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>rbd create registry --size <span class="m">20480</span> -m test01 -k ./ceph.client.admin.keyring
+</code></pre></div><h3 id="map-ceph-block-device">Map ceph block device</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>sudo rbd map registry --name client.admin -m test01
+cephadmin@test02:~/ceph<span class="nv">$ </span>sudo rbd map registry --name client.admin -m test01
+cephadmin@test03:~/ceph<span class="nv">$ </span>sudo rbd map registry --name client.admin -m test01
+</code></pre></div><h3 id="ocfs2">OCFS2</h3><h4 id="install-ocfs2">Install OCFS2</h4><p>Install ocfs2 and minimal X components on all nodes</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">sudo apt install ocfs2-tools ocfs2console x11-apps
+</code></pre></div><p>Create FS on ceph block device</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~/ceph<span class="nv">$ </span>sudo mkfs.ocfs2 /dev/rbd/rbd/registry
+</code></pre></div><p>Enable OCFS2 services on boot</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">/etc/init.d/o2cb <span class="nb">enable</span>
+</code></pre></div><h4 id="ocfs2-cluster-conf">OCFS2 Cluster Conf</h4><p><strong>/etc/ocfs2/cluster.conf</strong></p><div class="highlight"><pre><code class="language-text" data-lang="text">cluster:
+    node_count = 3
+    name = docker-registry
+node:
+    ip_port = 7777
+    ip_address = 192.168.122.105
+    number = 1
+    name = test01
+    cluster = docker-registry
+node:
+    ip_port = 7777
+    ip_address = 192.168.122.177
+    number = 2
+    name = test02
+    cluster = docker-registry
+node:
+    ip_port = 7777
+    ip_address = 192.168.122.106
+    number = 3
+    name = test03
+    cluster = docker-registry
+</code></pre></div><p>Replicate conf and copy <code>/etc/ocfs2/cluster.conf</code> to all nodes, and run:</p><h4 id="config-amp-start-services">Config &amp; Start Services</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">cephadmin@test01:~<span class="nv">$ </span>sudo dpkg-reconfigure ocfs2-tools
+cephadmin@test01:~<span class="nv">$ </span>sudo /etc/init.d/o2cb restart
+cephadmin@test01:~<span class="nv">$ </span>sudo /etc/init.d/ocfs2 start
+</code></pre></div><h4 id="mount-ocfs">Mount OCFS</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">sudo mkdir -p /mnt/registry
+<span class="nb">echo</span> <span class="s2">&quot;/dev/rbd/rbd/registry   /mnt/registry   ocfs2   noauto,_netdev,defaults   0 0&quot;</span> <span class="p">|</span> <span class="se">\</span>
+sudo tee -a /etc/fstab
+sudo mount -a
+</code></pre></div><h2 id="docker-swarm-amp-etcd-discovery">Docker Swarm &amp; ETCD discovery</h2><h3 id="install-docker">Install Docker</h3><div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="c">#!/bin/bash</span>
+<span class="nb">set</span> -e
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+<span class="nb">echo</span> <span class="s2">&quot;deb https://apt.dockerproject.org/repo ubuntu-trusty main&quot;</span> <span class="p">|</span> sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt update
+sudo apt-get install -y linux-image-extra-<span class="k">$(</span>uname -r<span class="k">)</span> docker-engine
+sudo sed -i <span class="s1">&#39;/GRUB_CMDLINE_LINUX\=\&quot;\&quot;/c\GRUB_CMDLINE_LINUX\=\&quot;cgroup_enable\=memory swapaccount\=1\&quot;&#39;</span> /etc/default/grub
+sudo update-grub
+<span class="nb">echo</span> <span class="s1">&#39;DOCKER_OPTS=&quot;-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock&quot;&#39;</span> <span class="p">|</span> <span class="se">\</span>
+sudo tee -a /etc/default/docker
+sudo shutdown -r now
+</code></pre></div><h3 id="etcd">ETCD</h3><h4 id="test01-node-1">test01 (node 1)</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -d -v /usr/share/ca-certificates/:/etc/ssl/certs -p 4001:4001 -p 2380:2380 -p 2379:2379 <span class="se">\</span>
+  --restart<span class="o">=</span>always <span class="se">\</span>
+  --name etcd quay.io/coreos/etcd:v2.2.2 <span class="se">\</span>
+  -name test01 <span class="se">\</span>
+  -advertise-client-urls http://192.168.122.105:2379,http://192.168.122.105:4001 <span class="se">\</span>
+  -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 <span class="se">\</span>
+  -initial-advertise-peer-urls http://192.168.122.105:2380 <span class="se">\</span>
+  -listen-peer-urls http://0.0.0.0:2380 <span class="se">\</span>
+  -initial-cluster-token etcd-cluster-1 <span class="se">\</span>
+  -initial-cluster <span class="nv">test01</span><span class="o">=</span>http://192.168.122.105:2380,test02<span class="o">=</span>http://192.168.122.177:2380,test03<span class="o">=</span>http://192.168.122.106:2380 <span class="se">\</span>
+  -initial-cluster-state new
+</code></pre></div><h4 id="test02-node-2">test02 (node 2)</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -d -v /usr/share/ca-certificates/:/etc/ssl/certs -p 4001:4001 -p 2380:2380 -p 2379:2379 <span class="se">\</span>
+  --restart<span class="o">=</span>always <span class="se">\</span>
+  --name etcd quay.io/coreos/etcd:v2.2.2 <span class="se">\</span>
+  -name test02 <span class="se">\</span>
+  -advertise-client-urls http://192.168.122.177:2379,http://192.168.122.177:4001 <span class="se">\</span>
+  -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 <span class="se">\</span>
+  -initial-advertise-peer-urls http://192.168.122.177:2380 <span class="se">\</span>
+  -listen-peer-urls http://0.0.0.0:2380 <span class="se">\</span>
+  -initial-cluster-token etcd-cluster-1 <span class="se">\</span>
+  -initial-cluster <span class="nv">test01</span><span class="o">=</span>http://192.168.122.105:2380,test02<span class="o">=</span>http://192.168.122.177:2380,test03<span class="o">=</span>http://192.168.122.106:2380 <span class="se">\</span>
+  -initial-cluster-state new
+</code></pre></div><h4 id="test03-node-3">test03 (node 3)</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -d -v /usr/share/ca-certificates/:/etc/ssl/certs -p 4001:4001 -p 2380:2380 -p 2379:2379 <span class="se">\</span>
+  --restart<span class="o">=</span>always <span class="se">\</span>
+  --name etcd quay.io/coreos/etcd:v2.2.2 <span class="se">\</span>
+  -name test03 <span class="se">\</span>
+  -advertise-client-urls http://192.168.122.106:2379,http://192.168.122.106:4001 <span class="se">\</span>
+  -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 <span class="se">\</span>
+  -initial-advertise-peer-urls http://192.168.122.106:2380 <span class="se">\</span>
+  -listen-peer-urls http://0.0.0.0:2380 <span class="se">\</span>
+  -initial-cluster-token etcd-cluster-1 <span class="se">\</span>
+  -initial-cluster <span class="nv">test01</span><span class="o">=</span>http://192.168.122.105:2380,test02<span class="o">=</span>http://192.168.122.177:2380,test03<span class="o">=</span>http://192.168.122.106:2380 <span class="se">\</span>
+  -initial-cluster-state new
+</code></pre></div><h4 id="join-node-to-existing-cluster">Join node to existing cluster</h4><p>Just change the &quot;-initial-cluster-state&quot; state to existing: <code>-initial-cluster-state existing</code></p><h4 id="test-etcd-cluster">Test etcd cluster</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker <span class="nb">exec </span>etcd /etcdctl <span class="se">\</span>
+  -C http://192.168.122.105:2379,http://192.168.122.177:2379,http://192.168.122.106:2379 member list
+</code></pre></div><h3 id="swarm">Swarm</h3><h4 id="nodes">Nodes</h4><p>Run this on all swarm nodes</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -d --name swarmnode <span class="se">\</span>
+  --restart<span class="o">=</span>always <span class="se">\</span>
+  swarm join <span class="se">\</span>
+  --addr<span class="o">=</span><span class="k">$(</span>ip addr show dev eth0 <span class="p">|</span> grep <span class="s2">&quot;inet &quot;</span> <span class="p">|</span> awk <span class="s1">&#39;{ print $2 }&#39;</span> <span class="p">|</span> awk -F <span class="se">\/</span> <span class="s1">&#39;{ print $1 }&#39;</span><span class="k">)</span>:2375 <span class="se">\</span>
+  etcd://192.168.122.105:4001,192.168.122.177:4001,192.168.122.106:4001/swarm
+</code></pre></div><h4 id="manage">Manage</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -p 2376:2375 -d <span class="se">\</span>
+  --restart<span class="o">=</span>always <span class="se">\</span>
+  --name swarmmanage <span class="se">\</span>
+  swarm manage <span class="se">\</span>
+  -H tcp://0.0.0.0:2375 <span class="se">\</span>
+  etcd://192.168.122.105:4001,192.168.122.177:4001,192.168.122.106:4001/swarm
+</code></pre></div><h4 id="docker-host-env-var">Docker Host env var</h4><p>Informar al docker client como conectar al swarm, donde en el ejemplo test01 es en donde corrimos el master</p><div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="nb">export </span><span class="nv">DOCKER_HOST</span><span class="o">=</span><span class="s1">&#39;tcp://test01:2376&#39;</span>
+</code></pre></div><h4 id="test-swarm">test swarm</h4><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker info
+</code></pre></div><h2 id="docker-registry">Docker Registry</h2><h3 id="reference">Reference</h3><p><a href="https://docs.docker.com/registry/deploying/">https://docs.docker.com/registry/deploying/</a></p><h3 id="some-background-information">Some background information</h3><p>Watch out for <code>DOCKER_HOST</code> env variable, this define on which manager will run the docker, for this test we want to run against to local docker not the swarm. Unset env variable:</p><div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="nb">unset </span>DOCKER_HOST
+</code></pre></div><p>Set env variable, where test01 it&#39;s where our manager it&#39;s running</p><div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="nb">export </span><span class="nv">DOCKER_HOST</span><span class="o">=</span><span class="s1">&#39;tcp://test01:2376&#39;</span>
+</code></pre></div><h4 id="work-directories">Work directories</h4><p>Lab dir structure:</p><div class="highlight"><pre><code class="language-text" data-lang="text">/mnt/registry
+├── certs
+├── docker-registry
+</code></pre></div><h3 id="registry-run">Registry run</h3><h4 id="basic-docker-registry-run">Basic docker registry run</h4><p>This command use a local dir (<code>/mnt/registry/docker-registry</code>) for the registry storage</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry <span class="se">\</span>
+  -v /mnt/registry/docker-registry:/var/lib/registry <span class="se">\</span>
+  registry:2
+</code></pre></div><h4 id="self-signed-registry-certificates">Self signed registry certificates</h4><p>Generate certs, don&#39;t forget use a FQDN domain, for this example will use <code>myregistry.mydomain</code></p><div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="nb">cd</span> /mnt/registry
+mkdir -p certs <span class="o">&amp;&amp;</span> openssl req <span class="se">\</span>
+  -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key <span class="se">\</span>
+  -x509 -days <span class="m">365</span> -out certs/domain.crt
+</code></pre></div><h5 id="prepare-docker-to-accept-certs">Prepare docker to accept certs</h5><p>Prepare docker to accept self signed sertificates</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">mkdir -p /etc/docker/certs.d/myregistry.mydomain:5000/
+cp /mnt/registry/certs/domain.crt /etc/docker/certs.d/myregistry.mydomain<span class="se">\:</span>5000/ca.crt
+service docker restart
+</code></pre></div><h4 id="docker-registry-with-self-signed-certs">Docker registry with self signed certs</h4><p>Start the docker registry container with the new self signed certs</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry <span class="se">\</span>
+  -v /mnt/registry/certs:/certs <span class="se">\</span>
+  -e <span class="nv">REGISTRY_HTTP_TLS_CERTIFICATE</span><span class="o">=</span>/certs/domain.crt <span class="se">\</span>
+  -e <span class="nv">REGISTRY_HTTP_TLS_KEY</span><span class="o">=</span>/certs/domain.key <span class="se">\</span>
+  registry:2
+</code></pre></div><h3 id="tag-amp-push-images">Tag &amp; Push images</h3><p>We are goind to pull an image from HUB, tagit and then pushit to our local registry</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker pull ubuntu
+docker tag ubuntu myregistry.mydomain:5000/ubuntu
+docker push myregistry.mydomain:5000/ubuntu
+</code></pre></div></article><div class="back"> <a href="/">Back</a></div></main></body></html>
