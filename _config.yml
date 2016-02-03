@@ -28,8 +28,8 @@ avatar: "/img/avatar-icon.png"
 # List of links in the navigation bar
 navbar-links:
   Home: ""
-  About Me: "aboutme"
-  Author's home: "http://www.ssebbass.com"
+  About Me: "aboutme.html"
+  # Author's home: "http://www.ssebbass.com"
   
 # --- Footer options --- #
 
