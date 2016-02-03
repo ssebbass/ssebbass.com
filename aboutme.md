@@ -1,16 +1,14 @@
 ---
 layout: page
-title: About me
-subtitle: Why you'd want to go on a date with me
+title: About
 ---
 
-My name is Inigo Montoya. I have the following qualities:
+I hope this can be a great point of encounter with you people, to share some of my knowledge and some of my “adventures” as a a father, a husband and the IT Guy from some enterprise.
+I’ve been living with my loving wife for several years, and we have a great son.
+I’ve been living in Buenos Aires since 2001; also I like to work with computers, even before to know what it’s to work :).
+Right now I’m working as a Linux/Unix Architect at and enterprise that administrate and on demand streaming site (not Netflix).
 
-- I rock a great mustache
-- I'm extremely loyal to my family
+Well this is my personal page, I hope you enjoy it.
+You can write to me at [ssebbass@gmail.com](mailto: ssebbass@gmail.com)
 
-What else do you need?
-
-### my history
-
-To be honest, I'm having some trouble remembering right now, so why don't you just watch [my movie](http://en.wikipedia.org/wiki/The_Princess_Bride_%28film%29) and it will answer **all** your questions.
+This site was generated with Jekyll, you can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll)
