@@ -1,5 +1,44 @@
-# --- Serving options --- #
+# Site Info
+title:              "sSeBBaSs's Littles adventures"
+description:        "Sebastian Juarez Personal Site"
+google_verify:      dM_ZKxVqXfi38Ib1F1FCXOVbnbKIWWEjh8C8eTlol_8 # Put your Google Verification here
+google_analytics:   UA-69227278-1 # Put your Google Analytics code
 
+# Author Info
+author_name:        "Sebastian Juarez"
+author_email:       ssebbass@gmail.com
+author_gravatar:    7e2bd2d3fcf3c7ea07a06233f0a48baf # Gravatar md5 hash
+# twitter_username:   HeiswayiNrird
+
+# Site Settings
+baseurl:            "" # Base URL must end WITHOUT a slash, default: ""
+page.url:           www.ssebbass.com
+permalink:          /notes/:title # Post permalink
+timezone:           Americas/Buenos_Aires # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+# Site Build
+highlighter:        pygments
+markdown:           redcarpet
+redcarpet:
+    extensions:     ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data", "highlight", "footnotes"]
+#arkdown:           kramdown
+#kramdown:
+#    input:          GFM
+sass:
+    style:          :compressed
+
+# Other Params
+include:            [ "robots.txt" ]
+exclude:            [ "LICENSE", "README.md", "CNAME", "vendor", "Gemfile" ]
+gems:
+  - jekyll-sitemap
+
+compress_html:
+    clippings:      all
+    ingore:
+        envs:       [ "test" ]
+
+<<<<<<< HEAD
 # url is the full website URL
 # baseurl is the website's URL without the hostname
 
@@ -79,17 +118,19 @@ redcarpet:
 paginate: 5
 
 # Default YAML values (more information on Jekyll's site)
+=======
+>>>>>>> 5ad593933d3eaa89455eb154461425869e87674b
 defaults:
   -
     scope:
-      path: ""
-      type: "posts"
+      path:         ""
     values:
-      comments: true  # add comments to all blog posts
+      layout:       "null"
   -
     scope:
-      path: "" # all files
+      type:         "pages"
     values:
+<<<<<<< HEAD
       layout: "default"
 
 # Exclude these files from production site
@@ -147,3 +188,11 @@ prose:
           label: "Publish"
           help: "Check to publish post, uncheck to hide."
   
+=======
+      layout:       "page"
+  -
+    scope:
+      type:         "posts"
+    values:
+      layout:       "post"
+>>>>>>> 5ad593933d3eaa89455eb154461425869e87674b

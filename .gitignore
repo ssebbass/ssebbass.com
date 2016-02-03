@@ -1,11 +1,59 @@
-# project
-_site
-.sass-cache
-.vagrant
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
 
-# general
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
 .DS_Store
+<<<<<<< HEAD
 Thumbs.db
 ehthumbs.db
 
 s3_website.yml
+=======
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Cache Files
+.sass-cache
+.sass-cache/*
+_gist_cache
+_gist_cache/*
+
+# s3_website credentials
+s3_website*
+>>>>>>> 5ad593933d3eaa89455eb154461425869e87674b

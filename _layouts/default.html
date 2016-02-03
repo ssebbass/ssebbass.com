@@ -1,34 +1,32 @@
 ---
-common-css:
-  - "/css/bootstrap.min.css"
-  - "/css/main.css"
-common-ext-css:
-  - "//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
-common-googlefonts:
-  - "Lora:400,700,400italic,700italic"
-  - "Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"
-common-js:
-  - "/js/jquery-1.11.2.min.js"
-  - "/js/bootstrap.min.js"
-  - "/js/main.js"
+layout: compress
+comments: true
 ---
 
 <!DOCTYPE html>
 <html lang="en">
-  
-  {% include head.html %}
 
-  <body>
-  
-    {% include nav.html %}
+	<head>
+		{% include head.html %}
+	</head>
 
-    <div role="main" class="container main-content">
-      {{ content }}
-    </div>
+	<body>
 
-    {% include footer.html %}
-  
-    {% include footer-scripts.html %}
-  
-  </body>
+		{% include header.html %}
+
+		<main>
+			{{ content | replace: '&#8617;', '&#8617;&#xfe0e;' }}
+		</main>
+
+		{% if page.path contains '_posts' %}
+
+			{% if content contains 'reversefootnote' %}
+				<aside class="note"></aside>
+				<script async src="{{site.baseurl}}/assets/footnotes.js"></script>
+			{% endif %}
+
+		{% endif %}
+
+	</body>
+
 </html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Playing With Docker And Zabbix</title><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@" /><meta name="twitter:title" content="Playing With Docker And Zabbix" /><meta name="twitter:description" content="Playing with docker and zabbixWhere are going to play with zabbix running in a docker container, the idea it&#39;s to test some basic utilization."><meta name="description" content="Playing with docker and zabbixWhere are going to play with zabbix running in a docker container, the idea it&#39;s to test some basic utilization."><meta name="google-site-verification" content="dM_ZKxVqXfi38Ib1F1FCXOVbnbKIWWEjh8C8eTlol_8"><link rel="icon" href="/assets/favicon.png"><link rel="apple-touch-icon" href="/assets/touch-icon.png"><link rel="stylesheet" href="//code.cdn.mozilla.net/fonts/fira.css"><link rel="stylesheet" href="/assets/core.css"><link rel="canonical" href="/notes/Playing-with-Docker-and-Zabbix"><link rel="alternate" type="application/atom+xml" title="sSeBBaSs's Littles adventures" href="/feed.xml" /></head><body><aside class="logo"> <a href="/"> <img src="http://www.gravatar.com/avatar/7e2bd2d3fcf3c7ea07a06233f0a48baf.png?s=80" class="gravatar"> </a> <span class="logo-prompt">Back to Home</span></aside><main> <noscript><style> article .footnotes { display: block; }</style></noscript><article><div class="center"><h1>Playing With Docker And Zabbix</h1><time>February 2, 2016</time></div><div class="divider"></div><h1 id="playing-with-docker-and-zabbix">Playing with docker and zabbix</h1><p>Where are going to play with zabbix running in a docker container, the idea it&#39;s to test some basic utilization.</p><h2 id="install-basic-docker-env">Install basic docker env</h2><p>I prefer to play with Ubuntu Server, but feel free to use any distro you want, you can always refer to <a href="https://docs.docker.com/linux/step_one/">docker docs</a> to get some more information, the install instructions for Ubuntu are:</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">wget -qO- https://get.docker.com/ <span class="p">|</span> sh
+</code></pre></div><p>Check docker:</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run hello-world
+</code></pre></div><h2 id="installing-the-basic-db">Installing the basic db</h2><p>Refer to: <a href="https://github.com/zabbix/zabbix-community-docker/tree/master/Dockerfile/zabbix-db-mariadb">https://github.com/zabbix/zabbix-community-docker/tree/master/Dockerfile/zabbix-db-mariadb</a></p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run <span class="se">\</span>
+  -d <span class="se">\</span>
+  --name zabbix-db <span class="se">\</span>
+  -p 3306:3306 <span class="se">\</span>
+  --env<span class="o">=</span><span class="s2">&quot;MARIADB_USER=admin&quot;</span> <span class="se">\</span>
+  --env<span class="o">=</span><span class="s2">&quot;MARIADB_PASS=password123&quot;</span> <span class="se">\</span>
+  --env<span class="o">=</span><span class="s2">&quot;DB_innodb_buffer_pool_size=768M&quot;</span> <span class="se">\</span>
+  zabbix/zabbix-db-mariadb
+</code></pre></div><p>Check if the container is running:</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker ps
+</code></pre></div><p>You should see something like this:</p><div class="highlight"><pre><code class="language-text" data-lang="text">$ docker ps
+CONTAINER ID        IMAGE                      COMMAND             CREATED             STATUS              PORTS                    NAMES
+8dbd73b6c50a        zabbix/zabbix-db-mariadb   &quot;/run.sh&quot;           37 minutes ago      Up 37 minutes       0.0.0.0:3306-&gt;3306/tcp   zabbix-db
+</code></pre></div><h2 id="start-zabbix">Start Zabbix</h2><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker run <span class="se">\</span>
+  -d <span class="se">\</span>
+  --link zabbix-db:zabbix-db <span class="se">\</span>
+  --name zabbix <span class="se">\</span>
+  -p 80:80 <span class="se">\</span>
+  -p 10051:10051 <span class="se">\</span>
+  --env<span class="o">=</span><span class="s2">&quot;ZS_DBHost=zabbix-db&quot;</span> <span class="se">\</span>
+  --env<span class="o">=</span><span class="s2">&quot;ZS_DBUser=admin&quot;</span> <span class="se">\</span>
+  --env<span class="o">=</span><span class="s2">&quot;ZS_DBPassword=password123&quot;</span> <span class="se">\</span>
+  zabbix/zabbix-2.4
+</code></pre></div><h2 id="that-39-s-all-folks">That&#39;s all folks...</h2><p>Well, thats all you have to do to start a real basic Zabbix deploy, now you can login on: <a href="http://localhost/">http://localhost/</a>, and remember, for extra info <a href="https://github.com/zabbix/zabbix-community-docker/tree/master/Dockerfile/zabbix-2.4">LINK</a></p><h2 id="compose">Compose</h2><p>Finally, you may say, these are too many steps!, no problem, try docker-compose, with this great tools you can get an up and running environment in just one command!, but how?, simple:</p><p>Create a file docker-compose.yml with:</p><div class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="l-Scalar-Plain">zabbix-db-storage</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">busybox:latest</span>
+  <span class="l-Scalar-Plain">volumes</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">/var/lib/mysql</span>
+
+<span class="l-Scalar-Plain">zabbix-db</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">zabbix/zabbix-db-mariadb</span>
+  <span class="l-Scalar-Plain">volumes</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">/backups:/backups</span>
+  <span class="l-Scalar-Plain">volumes_from</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">zabbix-db-storage</span>
+  <span class="l-Scalar-Plain">environment</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MARIADB_USER=zabbix</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">MARIADB_PASS=my_password</span>
+
+<span class="l-Scalar-Plain">zabbix-server</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">image</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">zabbix/zabbix-2.4</span>
+  <span class="l-Scalar-Plain">ports</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="s">&quot;80:80&quot;</span>
+    <span class="p-Indicator">-</span> <span class="s">&quot;10051:10051&quot;</span>
+  <span class="l-Scalar-Plain">links</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">zabbix-db:zabbix.db</span>
+  <span class="l-Scalar-Plain">environment</span><span class="p-Indicator">:</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ZS_DBHost=zabbix.db</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ZS_DBUser=zabbix</span>
+    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">ZS_DBPassword=my_password</span>
+</code></pre></div><p>and:</p><div class="highlight"><pre><code class="language-sh" data-lang="sh">docker-compose up -d
+</code></pre></div></article><div class="back"> <a href="/">Back</a></div></main></body></html>
