@@ -1,6 +1,7 @@
 ---
 layout: page
 title: About
+comments: true
 ---
 
 I hope this can be a great point of encounter with you people, to share some of my knowledge and some of my “adventures” as a a father, a husband and the IT Guy from some enterprise.

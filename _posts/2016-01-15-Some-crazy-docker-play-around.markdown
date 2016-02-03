@@ -1,3 +1,9 @@
+---
+layout: post
+title: Some-crazy-docker-play-around
+comments: true
+---
+
 # Some-crazy-docker-play-around
 
 In this test we are going to try to put all this pieces together **ceph + ocfs2 + etcd + docker + swarm + registry**
