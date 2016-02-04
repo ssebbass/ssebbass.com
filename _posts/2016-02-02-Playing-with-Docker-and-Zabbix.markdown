@@ -4,7 +4,6 @@ title: Playing with docker and zabbix
 comments: true
 ---
 
-# Playing with docker and zabbix
 Where are going to play with zabbix running in a docker container, the idea it's to test some basic utilization.
 
 ## Install basic docker env
