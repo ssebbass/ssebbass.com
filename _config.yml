@@ -100,7 +100,6 @@ exclude:
   - README.md
   - CNAME
   - Vagrantfile
-  - s3_website.yml
 
 # prose.io config
 prose:
