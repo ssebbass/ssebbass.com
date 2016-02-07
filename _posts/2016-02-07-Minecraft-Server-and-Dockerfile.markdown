@@ -14,31 +14,9 @@ Layer?, you may think this is to complicated, don't worry, this one of the great
 
 First let's take a look to my [Dockerfile](https://github.com/ssebbass/docker-minecraft/blob/master/Dockerfile):
 
-```Dockerfile
-# My First DockerFile
-# Just trying to get a minecraft server running to play with my son
-
-FROM java:jre
-MAINTAINER sSeBBaSs (ssebbass@gmail.com)
-EXPOSE 25565
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  imagemagick \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
-
-COPY minecraft.sh /minecraft.sh
-COPY run.sh /run.sh
-
-VOLUME ["/srv"]
-COPY server.properties /tmp/server.properties
-WORKDIR /srv
-
-RUN chmod +x /minecraft.sh \
-  && chmod +x /run.sh
-
-CMD [ "/run.sh" ]
-```
+{% highlight sh %}
+{% github_sample /ssebbass/docker-minecraft/blob/master/Dockerfile %}
+{% endhighlight %}
 
 Lets take a deeper look over the sections:
 
@@ -53,4 +31,7 @@ Lets take a deeper look over the sections:
 
 ### [run.sh](https://github.com/ssebbass/docker-minecraft/blob/master/run.sh)
 
+{% highlight sh %}
+{% github_sample /ssebbass/docker-minecraft/blob/master/run.sh %}
+{% endhighlight %}
 
