@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Some-crazy-docker-play-around
+title: Some crazy docker play around
 comments: true
 ---
 
