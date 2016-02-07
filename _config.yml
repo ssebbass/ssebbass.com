@@ -25,6 +25,9 @@ description: Sebastian Juarez Personal Site
 # Remove this parameter if you don't want an image in the navbar
 avatar: "/img/avatar-icon.png"
 
+# Gems
+gems: [jekyll_github_sample]
+
 # List of links in the navigation bar
 navbar-links:
   Home: ""
