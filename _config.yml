@@ -4,12 +4,12 @@
 # baseurl is the website's URL without the hostname
 
 # If you are building a simple GitHub user page (username.github.io) then use these settings:
-url: "http://www.ssebbass.com"
-baseurl: ""
+# url: "http://www.ssebbass.com"
+# baseurl: ""
 
 # If you are building a GitHub project page then use these settings:
-#url: "http://username.github.io/projectname"
-#baseurl: "/projectname"
+url: "http://ipfs.io/ipns/ssebbass.com/ipns"
+baseurl: "/ssebbass.com"
 
 # Of course don't forget to change the username and projectname to YOUR username and project
 
@@ -33,7 +33,7 @@ navbar-links:
   Home: ""
   About Me: "aboutme.html"
   # Author's home: "http://www.ssebbass.com"
-  
+
 # --- Footer options --- #
 
 # Change all these values or delete the ones you don't want.
@@ -46,7 +46,7 @@ author:
   twitter: no-twitter-here-please   # eg. daattali
   linkedin: /in/sebastian-juarez-3074078  # eg. "pub/dean-attali/8/946/143"
   stackoverflow: 3984937/ssebbass  # eg. "3943160/daattali"
- 
+
 # Select which links to show in the footer
 footer-links-active:
   rss: false
@@ -59,7 +59,7 @@ footer-links-active:
 
 # How to display the link to the website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "www.ssebbass.com"  # eg. "deanattali.com/beautiful-jekyll"
+url-pretty: "ssebbass.com"  # eg. "deanattali.com/beautiful-jekyll"
 
 # --- Misc --- #
 
@@ -148,4 +148,3 @@ prose:
           element: "checkbox"
           label: "Publish"
           help: "Check to publish post, uncheck to hide."
-  
