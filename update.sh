@@ -4,10 +4,5 @@
 echo downloading gravatar img...
 ./gravatar.sh ssebbass@gmail.com
 
-# building site
-echo building site...
-jekyll build
-
-# Push to s3
-echo pushing to s3...
-aws --profile ssebbass s3 sync ./_site/ s3://www.ssebbass.com --delete
+# Build & Publish
+jekyll build && ipfs name publish $(ipfs add -rq _site/ | tail -1 ) | tee publish
