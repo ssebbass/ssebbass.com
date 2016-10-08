@@ -1,0 +1,18 @@
+{
+    "Comment": "New IPFS address",
+    "Changes": [
+        {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "www.ssebbass.com.",
+                "Type": "TXT",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+"Value": "\"dnslink=/ipfs/QmYsUeSEQMvhna7SgoPeCVawFrkuZcZMJZwDMpNRyxj5g3\""
+                    }
+                ]
+            }
+        }
+    ]
+}
