@@ -9,7 +9,7 @@
                 "TTL": 300,
                 "ResourceRecords": [
                     {
-"Value": "\"dnslink=/ipfs/QmYsUeSEQMvhna7SgoPeCVawFrkuZcZMJZwDMpNRyxj5g3\""
+"Value": "\"dnslink=/ipfs/QmadpoRenCSHGGXozRBacDJoiQRju2j63SaCK7b3UhASuy\""
                     }
                 ]
             }
