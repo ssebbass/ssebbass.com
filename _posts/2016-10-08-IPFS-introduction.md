@@ -164,3 +164,7 @@ dig www.ssebbass.com TXT +short
 ```
 
 That's all, now you can go to [www.ssebbass.com](http://www.ssebbass.com) and browse the content.
+
+Yes this site it's hosted in IPFS directly from my personal computer, I also have a small instance on the cloud to seed the hash from that public DNS record, so at least one peer can share the content, but you can even take all yours peers down, and the content will still be there, at least until there is an online seed.
+
+
