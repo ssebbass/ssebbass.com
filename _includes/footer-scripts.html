@@ -1,23 +1,17 @@
-<!-- TODO hardcode the required JS because on 2016-02-01 GitHub pages migrated to jekyll 3 and broke this template -->
-<script src="/js/jquery-1.11.2.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
-<!-- end TODO -->
-
 {% if layout.common-ext-js %}
   {% for js in layout.common-ext-js %}
-	<script src="{{ js }}"></script>
+    {% include ext-js.html js=js %}
   {% endfor %}
 {% endif %}
 
-{% if layout.ext-js %}
-  {% for js in layout.ext-js %}
-	<script src="{{ js }}"></script>
+{% if page.ext-js %}
+  {% for js in page.ext-js %}
+    {% include ext-js.html js=js %}
   {% endfor %}
 {% endif %}
 
-{% if layout.js %}
-  {% for js in layout.js %}
+{% if page.js %}
+  {% for js in page.js %}
 	<script src="{{ js | prepend: site.baseurl | replace: '//', '/' }}"></script>
   {% endfor %}
 {% endif %}
