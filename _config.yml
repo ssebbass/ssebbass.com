@@ -110,7 +110,7 @@ title-separator: "-"
 # Output options (more information on Jekyll's site)
 timezone: "America/Argentina/Buenos_Aires"
 permalink: /:year-:month-:day-:title/
-highlighter:        pygments
+highlighter:        rouge
 markdown:           redcarpet
 redcarpet:
     extensions:     ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data", "highlight", "footnotes"]
